@@ -9,6 +9,6 @@ supersetRedis:
   replicas: 1
   supersetRedis:
     image:
-      repository: bitnami/redis
-      tag: 7.0.10-debian-11-r4
+      repository: redis
+      tag: 7.2
   type: ClusterIP
