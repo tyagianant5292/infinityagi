@@ -22,8 +22,6 @@ appVersion: "0.1.0"
 dependencies:
   - name: postgres
     repository: "file://charts/postgres"
-  - name: adminer
-    repository: "file://charts/adminer"
   - name: redis
     repository: "file://charts/redis"
   - name: redis-cache
