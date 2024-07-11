@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: netbox-redis-cache
+  labels:
+  {{- include "redis-cache.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.redisCache.type }}
+  selector:
+    app: redis-cache
+  {{- include "redis-cache.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.redisCache.ports | toYaml | nindent 2 -}}

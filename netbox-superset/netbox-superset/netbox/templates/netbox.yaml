@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "netbox.fullname" . }}-netbox
+  labels:
+  {{- include "netbox.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.netbox.type }}
+  selector:
+    app: netbox
+  {{- include "netbox.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.netbox.ports | toYaml | nindent 2 -}}

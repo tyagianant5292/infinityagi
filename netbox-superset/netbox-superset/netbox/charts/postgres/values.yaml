@@ -1,0 +1,23 @@
+config:
+  postgresDb: netbox
+  postgresPassword: J5brHrAXFLQSif0K
+  postgresUser: netbox
+  supersetDbname: superset
+  supersetDbuser: supersetuser
+  supersetDbPassword: supersetpassword  
+kubernetesClusterDomain: cluster.local
+postgres:
+  ports:
+  - port: 5432
+    targetPort: 0
+  postgres:
+    env:
+      pgdata: /var/lib/postgresql/data/pgdata
+    image:
+      repository: postgres
+      tag: 14.9
+  replicas: 1
+  type: ClusterIP
+pvc:
+  dataPvc:
+    storageRequest: 5Gi

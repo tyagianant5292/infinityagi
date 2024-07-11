@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "redis-cache.fullname" . }}-redis-cache
+  labels:
+  {{- include "redis-cache.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.redisCache.replicas }}
+  selector:
+    matchLabels:
+      app: redis-cache
+    {{- include "redis-cache.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: redis-cache
+      {{- include "redis-cache.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - sh
+        - -c
+        - redis-server --requirepass $$REDIS_PASSWORD
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - secretRef:
+            name: {{ include "redis-cache.fullname" . }}-secret
+        image: {{ .Values.redisCache.redisCache.image.repository }}:{{ .Values.redisCache.redisCache.image.tag
+          | default .Chart.AppVersion }}
+        name: redis-cache
+        ports:
+        - containerPort: 6379
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: redis-cache-data
+      volumes:
+      - name: redis-cache-data
+        persistentVolumeClaim:
+          claimName: {{ include "redis-cache.fullname" . }}-data-pvc

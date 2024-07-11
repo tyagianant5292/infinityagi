@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "postgres.fullname" . }}-postgres
+  labels:
+  {{- include "postgres.labels" . | nindent 4 }}
+spec:
+  serviceName: "{{ include "postgres.fullname" . }}-postgres"
+  replicas: {{ .Values.postgres.replicas }}
+  selector:
+    matchLabels:
+      app: postgres
+    {{- include "postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: postgres
+      {{- include "postgres.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: PGDATA
+          value: {{ quote .Values.postgres.postgres.env.pgdata }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "postgres.fullname" . }}-config
+        image: {{ .Values.postgres.postgres.image.repository }}:{{ .Values.postgres.postgres.image.tag | default .Chart.AppVersion }}
+        name: postgres
+        ports:
+        - containerPort: 5432
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-data
+          subPath: postgres
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+      labels:
+      {{- include "postgres.labels" . | nindent 8 }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.pvc.dataPvc.storageRequest | quote }}

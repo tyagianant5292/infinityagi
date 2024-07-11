@@ -1,0 +1,16 @@
+kubernetesClusterDomain: cluster.local
+pvc:
+  dataPvc:
+    storageRequest: 1Gi
+redisCache:
+  ports:
+  - port: 6379
+    targetPort: 0
+  redisCache:
+    image:
+      repository: chub.cloud.gov.in/library/redis
+      tag: 7-alpine
+  replicas: 1
+  type: ClusterIP
+secret:
+  redisPassword: "t4Ph722qJ5QHeQ1qfu36"
