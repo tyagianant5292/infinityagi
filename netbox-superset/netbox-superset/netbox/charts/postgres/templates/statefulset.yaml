@@ -43,6 +43,7 @@ spec:
     spec:
       accessModes:
       - ReadWriteOnce
+      storageClassName: local-path
       resources:
         requests:
           storage: {{ .Values.pvc.dataPvc.storageRequest | quote }}
