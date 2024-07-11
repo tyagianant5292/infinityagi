@@ -10,4 +10,4 @@ spec:
     app: postgres
   {{- include "postgres.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.postgres.ports | toYaml | nindent 2 -}}
+    {{- .Values.postgres.ports | toYaml | nindent 2 -}}
