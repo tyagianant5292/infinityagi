@@ -1,0 +1,14 @@
+kubernetesClusterDomain: cluster.local
+pvc:
+  dataPvc:
+    storageRequest: 1Gi
+supersetRedis:
+  ports:
+  - port: 6379
+    targetPort: 0
+  replicas: 1
+  supersetRedis:
+    image:
+      repository: bitnami/redis
+      tag: 7.0.10-debian-11-r4
+  type: ClusterIP

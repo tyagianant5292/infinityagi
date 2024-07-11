@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "superset.fullname" . }}-config
+  labels:
+  {{- include "superset.labels" . | nindent 4 }}
+data:
+  BUILD_SUPERSET_FRONTEND_IN_DOCKER: {{ .Values.config.buildSupersetFrontendInDocker
+    | quote }}
+  COMPOSE_PROJECT_NAME: {{ .Values.config.composeProjectName | quote }}
+  CYPRESS_CONFIG: {{ .Values.config.cypressConfig | quote }}
+  DATABASE_DB: {{ .Values.config.databaseDb | quote }}
+  DATABASE_DIALECT: {{ .Values.config.databaseDialect | quote }}
+  DATABASE_HOST: {{ .Values.config.databaseHost | quote }}
+  DATABASE_PASSWORD: {{ .Values.config.databasePassword | quote }}
+  DATABASE_PORT: {{ .Values.config.databasePort | quote }}
+  DATABASE_USER: {{ .Values.config.databaseUser | quote }}
+  ENABLE_PLAYWRIGHT: {{ .Values.config.enablePlaywright | quote }}
+  # EXAMPLES_DB: {{ .Values.config.examplesDb | quote }}
+  # EXAMPLES_HOST: {{ .Values.config.examplesHost | quote }}
+  # EXAMPLES_PASSWORD: {{ .Values.config.examplesPassword | quote }}
+  # EXAMPLES_PORT: {{ .Values.config.examplesPort | quote }}
+  # EXAMPLES_USER: {{ .Values.config.examplesUser | quote }}
+  FLASK_DEBUG: {{ .Values.config.flaskDebug | quote }}
+  MAPBOX_API_KEY: {{ .Values.config.mapboxApiKey | quote }}
+  POSTGRES_DB: {{ .Values.config.postgresDb | quote }}
+  POSTGRES_PASSWORD: {{ .Values.config.postgresPassword | quote }}
+  POSTGRES_USER: {{ .Values.config.postgresUser | quote }}
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: {{ .Values.config.puppeteerSkipChromiumDownload
+    | quote }}
+  PYTHONPATH: {{ .Values.config.pythonpath | quote }}
+  REDIS_HOST: {{ .Values.config.redisHost | quote }}
+  REDIS_PORT: {{ .Values.config.redisPort | quote }}
+  SUPERSET_ENV: {{ .Values.config.supersetEnv | quote }}
+  SUPERSET_LOAD_EXAMPLES: {{ .Values.config.supersetLoadExamples | quote }}
+  SUPERSET_PORT: {{ .Values.config.supersetPort | quote }}
+  SUPERSET_SECRET_KEY: {{ .Values.config.supersetSecretKey | quote }}

@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "netbox.fullname" . }}-netbox
+  labels:
+  {{- include "netbox.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.netbox.replicas }}
+  selector:
+    matchLabels:
+      app: netbox
+    {{- include "netbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: netbox
+      {{- include "netbox.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "netbox.fullname" . }}-config
+        image: {{ .Values.netbox.netbox.image.repository }}:{{ .Values.netbox.netbox.image.tag
+          | default .Chart.AppVersion }}
+        name: netbox
+        ports:
+        - containerPort: 8080
+        resources: {}
+        volumeMounts:
+        - mountPath: /opt/netbox/netbox/media
+          name: netbox-media-files
+        - mountPath: /opt/netbox/netbox/reports
+          name: netbox-reports-files
+        - mountPath: /opt/netbox/netbox/scripts
+          name: netbox-scripts-files
+      volumes:
+      - name: netbox-media-files
+        persistentVolumeClaim:
+          claimName: {{ include "netbox.fullname" . }}-media-files-pvc
+      - name: netbox-reports-files
+        persistentVolumeClaim:
+          claimName: {{ include "netbox.fullname" . }}-reports-files-pvc
+      - name: netbox-scripts-files
+        persistentVolumeClaim:
+          claimName: {{ include "netbox.fullname" . }}-scripts-files-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "netbox.fullname" . }}-worker
+  labels:
+  {{- include "netbox.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app: netbox-worker
+    {{- include "netbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: netbox-worker
+      {{- include "netbox.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - python
+        - /opt/netbox/netbox/manage.py
+        - rqworker
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "netbox.fullname" . }}-config
+        image: {{ .Values.worker.netboxWorker.image.repository }}:{{ .Values.worker.netboxWorker.image.tag
+          | default .Chart.AppVersion }}
+        name: netbox-worker
+        resources: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "netbox.fullname" . }}-housekeeping
+  labels:
+  {{- include "netbox.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.housekeeping.replicas }}
+  selector:
+    matchLabels:
+      app: netbox-housekeeping
+    {{- include "netbox.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: netbox-housekeeping
+      {{- include "netbox.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - /opt/netbox/contrib/netbox-housekeeping.sh
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "netbox.fullname" . }}-config
+        image: {{ .Values.housekeeping.netboxHousekeeping.image.repository }}:{{ .Values.housekeeping.netboxHousekeeping.image.tag
+          | default .Chart.AppVersion }}
+        name: netbox-housekeeping
+        resources: {}

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "netbox.fullname" . }}-scripts-files-pvc
+  labels:
+  {{- include "netbox.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pvc.scriptsFilesPvc.storageRequest | quote }}

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "superset-redis.fullname" . }}-superset-redis
+  labels:
+  {{- include "superset-redis.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.supersetRedis.replicas }}
+  selector:
+    matchLabels:
+      app: superset-redis
+    {{- include "superset-redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: superset-redis
+      {{- include "superset-redis.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.supersetRedis.supersetRedis.image.repository }}:{{ .Values.supersetRedis.supersetRedis.image.tag
+          | default .Chart.AppVersion }}
+        name: superset-redis
+        ports:
+        - containerPort: 6379
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: superset-redis-data
+      volumes:
+      - name: superset-redis-data
+        persistentVolumeClaim:
+          claimName: {{ include "superset-redis.fullname" . }}-data-pvc

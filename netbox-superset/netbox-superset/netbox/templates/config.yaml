@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "netbox.fullname" . }}-config
+  labels:
+  {{- include "netbox.labels" . | nindent 4 }}
+data:
+  DB_HOST: {{ .Values.config.dbHost | quote }}
+  DB_NAME: {{ .Values.config.dbName | quote }}
+  DB_PASSWORD: {{ .Values.config.dbPassword | quote }}
+  DB_PORT: {{ .Values.config.dbPort | quote }}
+  DB_USER: {{ .Values.config.dbUser | quote }}
+  REDIS_CACHE_DATABASE: {{ .Values.config.redisCacheDatabase | quote }}
+  REDIS_CACHE_HOST: {{ .Values.config.redisCacheHost | quote }}
+  REDIS_CACHE_PASSWORD: {{ .Values.config.redisCachePassword | quote }}
+  REDIS_CACHE_PORT: {{ .Values.config.redisCachePort | quote }}
+  REDIS_CACHE_SSL: {{ .Values.config.redisCacheSsl | quote }}
+  REDIS_DATABASE: {{ .Values.config.redisDatabase | quote }}
+  REDIS_HOST: {{ .Values.config.redisHost | quote }}
+  REDIS_PASSWORD: {{ .Values.config.redisPassword | quote }}
+  REDIS_PORT: {{ .Values.config.redisPort | quote }}
+  REDIS_SSL: {{ .Values.config.redisSsl | quote }}
+  SECRET_KEY: {{ .Values.config.secretKey | quote }}
+  CSRF_TRUSTED_ORIGINS: {{ .Values.config.csrfTrustedOrigins | quote }}

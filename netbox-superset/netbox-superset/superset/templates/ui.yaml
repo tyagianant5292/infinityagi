@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "superset.fullname" . }}-ui
+  labels:
+    app: superset
+  {{- include "superset.labels" . | nindent 4 }}
+spec:
+  rules:
+  - host: servicedcimdashboard.cloud.gov.in
+    http:
+      paths:
+      - backend:
+          service:
+            name: '{{ include "superset.fullname" . }}-superset'
+            port:
+              number: 8088
+        path: /
+        pathType: Prefix
+#  tls:
+#  - hosts:
+#    - servicedcimdashboard.preprodcloud.nic.in
+#    secretName: preprod-certs

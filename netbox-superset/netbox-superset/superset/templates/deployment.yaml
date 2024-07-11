@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "superset.fullname" . }}-superset
+  labels:
+  {{- include "superset.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.superset.replicas }}
+  selector:
+    matchLabels:
+      app: superset
+    {{- include "superset.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: superset
+      {{- include "superset.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - /app/docker/docker-bootstrap.sh
+        - app-gunicorn
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "superset.fullname" . }}-config
+        image: {{ .Values.superset.superset.image.repository }}:{{ .Values.superset.superset.image.tag
+          | default .Chart.AppVersion }}
+        name: superset
+        ports:
+        - containerPort: 8088
+        resources: {}
+        securityContext: {{- toYaml .Values.superset.superset.containerSecurityContext
+          | nindent 10 }}
+        volumeMounts:
+        - mountPath: /app/superset_home
+          name: superset-home-data
+      volumes:
+      - name: superset-home-data
+        persistentVolumeClaim:
+          claimName: {{ include "superset.fullname" . }}-home-data-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "superset.fullname" . }}-worker
+  labels:
+  {{- include "superset.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app: superset-worker
+    {{- include "superset.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: superset-worker
+      {{- include "superset.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - /app/docker/docker-bootstrap.sh
+        - worker
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "superset.fullname" . }}-config
+        image: {{ .Values.worker.supersetWorker.image.repository }}:{{ .Values.worker.supersetWorker.image.tag
+          | default .Chart.AppVersion }}
+        name: superset-worker
+        resources: {}
+        securityContext: {{- toYaml .Values.worker.supersetWorker.containerSecurityContext
+          | nindent 10 }}
+        volumeMounts:
+        - mountPath: /app/superset_home
+          name: superset-home-data
+      volumes:
+      - name: superset-home-data
+        persistentVolumeClaim:
+          claimName: {{ include "superset.fullname" . }}-home-data-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "superset.fullname" . }}-worker-beat
+  labels:
+  {{- include "superset.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.workerBeat.replicas }}
+  selector:
+    matchLabels:
+      app: superset-worker-beat
+    {{- include "superset.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: superset-worker-beat
+      {{- include "superset.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - /app/docker/docker-bootstrap.sh
+        - beat
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "superset.fullname" . }}-config
+        image: {{ .Values.workerBeat.supersetWorkerBeat.image.repository }}:{{ .Values.workerBeat.supersetWorkerBeat.image.tag
+          | default .Chart.AppVersion }}
+        name: superset-worker-beat
+        resources: {}
+        securityContext: {{- toYaml .Values.workerBeat.supersetWorkerBeat.containerSecurityContext
+          | nindent 10 }}
+        volumeMounts:
+        - mountPath: /app/superset_home
+          name: superset-home-data
+      volumes:
+      - name: superset-home-data
+        persistentVolumeClaim:
+          claimName: {{ include "superset.fullname" . }}-home-data-pvc

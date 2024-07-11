@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: superset-redis
+  labels:
+  {{- include "superset-redis.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.supersetRedis.type }}
+  selector:
+    app: superset-redis
+  {{- include "superset-redis.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.supersetRedis.ports | toYaml | nindent 2 -}}

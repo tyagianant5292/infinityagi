@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "superset.fullname" . }}-init-job
+  labels:
+  {{- include "superset.labels" . | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.initJob.backoffLimit }}
+  template:
+    metadata:
+      labels:
+        app: superset-init
+    spec:
+      containers:
+      - command:
+        - /app/docker/docker-init.sh
+        env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "superset.fullname" . }}-config
+        image: {{ .Values.initJob.supersetInit.image.repository }}:{{ .Values.initJob.supersetInit.image.tag
+          | default .Chart.AppVersion }}
+        name: superset-init
+        resources: {}
+        securityContext: {{- toYaml .Values.initJob.supersetInit.containerSecurityContext
+          | nindent 10 }}
+        volumeMounts:
+        - mountPath: /app/superset_home
+          name: superset-home-data
+      restartPolicy: Never
+      volumes:
+      - name: superset-home-data
+        persistentVolumeClaim:
+          claimName: {{ include "superset.fullname" . }}-home-data-pvc
